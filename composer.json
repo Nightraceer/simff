@@ -12,10 +12,9 @@
       "Simff\\Router\\": "src/Simff/Router",
       "Simff\\Template\\": "src/Simff/Template",
       "Simff\\Form\\": "src/Simff/Form",
-      "Simff\\Validators\\": "src/Simff/Validators",
       "Simff\\Module\\": "src/Simff/Module",
       "Simff\\Pagination\\": "src/Simff/Pagination",
-      "Simff\\Components\\": "src/Simff/Components"
+      "Simff\\Helpers\\": "src/Simff/Helpers"
     },
     "files": [
       "src/Simff/dump.php"
