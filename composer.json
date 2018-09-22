@@ -1,0 +1,32 @@
+{
+  "name": "simff",
+  "homepage": "https://github.com/Nightraceer/simff",
+  "description": "Simple fast framework",
+  "version": "1.0.0",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Simff\\Main\\": "src/Simff/Main",
+      "Simff\\Request\\": "src/Simff/Request",
+      "Simff\\Controller\\": "src/Simff/Controller",
+      "Simff\\Router\\": "src/Simff/Router",
+      "Simff\\Template\\": "src/Simff/Template",
+      "Simff\\Form\\": "src/Simff/Form",
+      "Simff\\Validators\\": "src/Simff/Validators",
+      "Simff\\Module\\": "src/Simff/Module",
+      "Simff\\Pagination\\": "src/Simff/Pagination",
+      "Simff\\Components\\": "src/Simff/Components"
+    },
+    "files": [
+      "src/Simff/dump.php"
+    ]
+  },
+  "require": {
+    "php": ">=5.6",
+    "imagine/imagine": "^0.6.3",
+    "fenom/fenom": ">=2.11.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5"
+  }
+}
