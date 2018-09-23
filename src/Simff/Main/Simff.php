@@ -67,6 +67,14 @@ class Simff
         }
     }
 
+    public function getUser()
+    {
+        if ($this->hasComponent('auth')) {
+            return $this->getComponent('auth')->getUser();
+        }
+        return null;
+    }
+
     protected function handleRequest()
     {
         /** @var HttpRequest $request */

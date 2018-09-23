@@ -11,13 +11,14 @@ class Connection
      * @var PDO
      */
     protected $_pdo;
-    protected $stm;
+    protected $stm = null;
 
     public $host;
     public $database;
     public $username;
     public $password;
     public $charset = 'utf8';
+    public $engine = 'InnoDB';
 
     public function init()
     {
@@ -38,22 +39,30 @@ class Connection
         $this->stm = $this->_pdo->prepare($sql);
         return $this;
     }
-    public function execute()
+
+    public function execute($params = [], $reset = false)
     {
-        return $this->stm->execute();
+        $result = $this->stm->execute($params);
+
+        if ($reset) {
+            $this->stm = null;
+        }
+        return $result;
     }
-    public function resultSet()
+
+    public function resultSet($params = [])
     {
-        $this->execute();
-        return $this->stm->fetchAll(PDO::FETCH_ASSOC);
+        $this->execute($params);
+        $result = $this->stm->fetchAll(PDO::FETCH_ASSOC);
+        $this->stm = null;
+        return $result;
     }
-    public function single()
+
+    public function single($params = [])
     {
-        $this->execute();
-        return $this->stm->fetch(PDO::FETCH_ASSOC);
-    }
-    public function rowCount()
-    {
-        return $this->stm->rowCount();
+        $this->execute($params);
+        $result = $this->stm->fetch(PDO::FETCH_ASSOC);
+        $this->stm = null;
+        return $result;
     }
 }

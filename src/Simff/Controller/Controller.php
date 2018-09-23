@@ -5,6 +5,7 @@ namespace Simff\Controller;
 
 use http\Env\Request;
 use ReflectionMethod;
+use Simff\Form\Form;
 use Simff\Helpers\SmartProperties;
 use Simff\Main\Simff;
 
@@ -112,5 +113,28 @@ class Controller
     {
         header('Content-Type: application/json');
         echo json_encode($data);
+    }
+
+    public function ajaxValidation(Form $form, $redirect = false)
+    {
+        if (isset($_POST[$form->getName()]) && Simff::app()->request->getIsAjax()) {
+            $data = [
+                'state' => 'success'
+            ];
+
+            if ($redirect) {
+                $data['redirect'] = $redirect;
+            }
+
+            if (!($form->fill($_POST, $_FILES) && $form->validate() && $form->save())) {
+                $data = [
+                    'state' => 'errors',
+                    'errors' => $form->getErrors()
+                ];
+            }
+
+            $this->jsonResponse($data);
+            Simff::app()->end();
+        }
     }
 }

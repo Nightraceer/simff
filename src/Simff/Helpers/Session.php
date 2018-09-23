@@ -1,6 +1,6 @@
 <?php
 
-namespace Simff\Request;
+namespace Simff\Helpers;
 
 use Countable;
 

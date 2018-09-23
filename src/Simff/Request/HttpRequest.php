@@ -3,13 +3,17 @@
 namespace Simff\Request;
 
 
-use Simff\Request\Session;
+use Simff\Helpers\Creator;
+use Simff\Helpers\Session;
+use Simff\Helpers\SmartProperties;
 use Simff\Helpers\Collection;
 use Simff\Helpers\CookieCollection;
 use Simff\Main\Simff;
 
 class HttpRequest
 {
+    use SmartProperties;
+
     protected $_hostInfo;
 
     protected $_baseUrl;
@@ -61,7 +65,7 @@ class HttpRequest
         if ($session instanceof Session) {
             $this->_session = $session;
         } elseif (is_array($session) || is_string($session)) {
-            $this->_session = Configurator::create($session);
+            $this->_session = Creator::run($session);
         }
     }
 
@@ -419,8 +423,8 @@ class HttpRequest
     {
         if (is_object($url) && method_exists($url, 'getAbsoluteUrl')) {
             $url = $url->getAbsoluteUrl();
-        } elseif (strpos($url, ':') !== false) {
-            $url = Simff::app()->router->url($url, $data);
+        } elseif (strpos($url, '.') !== false) {
+            $url = Simff::app()->router->getUrl($url, $data);
         }
 
         header('Location: '.$url, true, $statusCode);
