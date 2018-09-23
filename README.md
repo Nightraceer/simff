@@ -2,4 +2,4 @@
 
 Простой, быстрый фреймворк
 
-Архитектура заимствована с [Phact-smf](https://github.com/phact-cmf)
+Концепция архитектуры заимствована с [Phact-smf](https://github.com/phact-cmf)
