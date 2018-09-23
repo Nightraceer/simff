@@ -14,7 +14,9 @@
       "Simff\\Form\\": "src/Simff/Form",
       "Simff\\Module\\": "src/Simff/Module",
       "Simff\\Pagination\\": "src/Simff/Pagination",
-      "Simff\\Helpers\\": "src/Simff/Helpers"
+      "Simff\\Helpers\\": "src/Simff/Helpers",
+      "Simff\\Db\\": "src/Simff/Db",
+      "Simff\\Model\\": "src/Simff/Model"
     },
     "files": [
       "src/Simff/dump.php"
