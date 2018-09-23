@@ -21,7 +21,11 @@ trait Components
     public function getComponent($name)
     {
         if (!isset($this->_components[$name])) {
-            throw new \Exception("Component with name " . $name . " not found");
+            if (isset($this->_componentsConfig[$name])) {
+                $this->_components[$name] = Creator::run($this->_componentsConfig[$name]);
+            } else {
+                throw new \Exception("Component with name " . $name . " not found");
+            }
         }
 
         return $this->_components[$name];

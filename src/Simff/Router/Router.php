@@ -13,12 +13,12 @@ class Router
     {
         $modules = Simff::app()->getModulesConfig();
         foreach ($modules as $name => $config) {
-            if (isset($config['routes'])) {
-                if (!isset($config['routes']['methods'])) {
-                    $config['routes']['methods'] = ['POST', 'GET'];
-                }
+            if (method_exists($config['class'], 'getRoutes')) {
+                $routes = $config['class']::getRoutes();
 
-                $this->_routes[$name.'.'.$config['routes']['name']] = $config['routes'];
+                foreach ($routes as $routeConfig) {
+                    $this->addRoute($name, $routeConfig);
+                }
             }
         }
     }
@@ -37,7 +37,11 @@ class Router
         }
 
         foreach ($this->_routes as $route) {
-            list($methods, $_route, $target, $name, $constraints) = $route;
+            $methods = $route['methods'];
+            $_route = $route['route'];
+            $target = $route['target'];
+            $constraints = $route['constraints'];
+            $name = $route['name'];
 
             $method_match = false;
 
@@ -50,7 +54,7 @@ class Router
 
             if (!$method_match) continue;
 
-            $isConstraint = preg_match_all('/{(.*?)}/', $_route, $matchesConstraint);
+            $isConstraint = preg_match_all('/{.*?}/ui', $_route, $matchesConstraint);
 
             if (!$isConstraint) {
                 if ($url === $_route) {
@@ -60,14 +64,77 @@ class Router
                     ];
                 }
             } else {
-                unset($matchesConstraint[0]);
+                $pregRoute = $_route;
+                $keyParams = [];
+                $replace = [];
+                foreach (current($matchesConstraint) as $match) {
+                    $constraintName = preg_replace('/[{}]/ui', '', $match);
+                    $keyParams[] = $constraintName;
+                    $params[$match] = '('.$constraints[$constraintName].')';
+                }
+                $pregRoute = strtr($pregRoute, $params);
+                $pregRoute = preg_replace('/\//', '\/', $pregRoute);
+                $pregRoute = '/^' . $pregRoute . '$/iu';
 
-                if ($matchesConstraint) {
+                $find = preg_match($pregRoute, $url, $resultMatches);
 
+                if ($find) {
+                    unset($resultMatches[0]);
+                    $params = array_combine($keyParams, $resultMatches);
+
+                    $matches[] = [
+                        'target' => $target,
+                        'params' => $params
+                    ];
                 }
             }
         }
 
         return $matches;
+    }
+
+    protected function addRoute($nameModule, $routeConfig = [])
+    {
+        $absoluteName = $nameModule . '.' . $routeConfig['name'];
+
+        if (isset($this->_routes[$absoluteName])) {
+            throw new \Exception("Can not redeclare route '{$absoluteName}'");
+        }
+
+        $methods = isset($routeConfig['methods']) ? $routeConfig['methods'] : ['POST', 'GET'];
+        $route = isset($routeConfig['route']) ? $routeConfig['route'] : "/";
+        $target = isset($routeConfig['target']) ? $routeConfig['target'] : null;
+        $constrains = isset($routeConfig['constraints']) ? $routeConfig['constraints'] : null;
+        $name = isset($routeConfig['name']) ? $routeConfig['name'] : "";
+
+        $this->_routes[$absoluteName] = [
+            'methods' => $methods,
+            'route' => $route,
+            'target' => $target,
+            'constraints' => $constrains,
+            'name' => $name
+        ];
+    }
+
+    public function getUrl($routeName, $params = [])
+    {
+        if (isset($this->_routes[$routeName])) {
+            $route = $this->_routes[$routeName];
+            $url = $route['route'];
+
+            if ($route['constraints']) {
+                if (!$params) {
+                    throw new \Exception("Route $routeName must accept the parameters");
+                }
+
+                $url = preg_replace('/[{}]/iu', '', strtr($url, $params));
+
+                return $url;
+            }
+
+            return $url;
+        }
+
+        throw new \Exception("Route $routeName not found");
     }
 }

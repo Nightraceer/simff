@@ -32,12 +32,6 @@ trait ConfigModules {
                 throw new \Exception("Unable to configure module {$key}");
             }
 
-            $routesPath = Paths::file("app.Modules.$name", 'php');
-
-            if ($routesPath) {
-                $routes = include $routesPath;
-                $config['routes'] = $routes;
-            }
             $class = '\\Modules\\' . $name . '\\' . $name . 'Module';
             $config['class'] = $class;
             $configs[$name] = $config;

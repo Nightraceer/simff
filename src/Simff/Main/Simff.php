@@ -15,25 +15,27 @@ class Simff
     /**
      * @var self
      */
-    protected static $app;
+    protected static $_app;
 
     public static function run($config)
     {
-        if (!self::$app) {
-            self::$app = Creator::run(self::class, $config);
+        if (!static::$_app) {
+            static::$_app = new static();
         }
 
-        self::$app->handleRequest();
-        self::$app->end();
+        Creator::configure(static::$_app, $config);
+
+        static::$_app->init();
+        static::$_app->end();
 
     }
 
     public static function app()
     {
-        return self::$app;
+        return static::$_app;
     }
 
-    protected function init()
+    public function init()
     {
         $this->setUpPaths();
         $this->handleRequest();
@@ -63,16 +65,6 @@ class Simff
         if (!is_dir($runtimePath) || !is_writable($runtimePath)) {
             throw new \Exception('Runtime path must be a valid and writable directory. Please, set up correct runtime path in "paths" section of configuration.');
         }
-
-        $modulesPath = Paths::get('Modules');
-        if (!$modulesPath) {
-            $modulesPath = Paths::get('app.Modules');
-            Paths::add('Modules', $modulesPath);
-            foreach ($this->getModulesConfig() as $name => $config) {
-                $class = $config['class'];
-                Paths::add("Modules.{$name}", $class::getPath());
-            }
-        }
     }
 
     protected function handleRequest()
@@ -85,6 +77,7 @@ class Simff
         $method = $request->getMethod();
 
         $matches = $router->match($url, $method);
+
         foreach ($matches as $match) {
             $matched = false;
             if (is_array($match['target']) && isset($match['target'][0])) {

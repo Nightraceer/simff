@@ -36,6 +36,8 @@ class Controller
     {
         if (!$action) {
             $action = $this->defaultAction;
+        } else {
+            $action = $action . 'Action';
         }
         $this->beforeAction($action, $params);
         if (method_exists($this, $action)) {
